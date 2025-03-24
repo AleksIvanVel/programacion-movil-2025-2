@@ -1,308 +1,141 @@
 import 'package:flutter/material.dart';
 
-class Calculadora extends StatefulWidget{
+class Calculadora extends StatefulWidget {
   const Calculadora({super.key});
 
   @override
   State<Calculadora> createState() => _CalculadoraState();
 }
 
-
-class _CalculadoraState extends State<Calculadora>{
-
-  String _display = "";
-  String _operacion = "";
-  bool _isdouble = false;
-  double? _ope1 = null;
-  double? _ope2 = null;
+class _CalculadoraState extends State<Calculadora> {
+  String _Sres = "";
+  bool _punto = false;
   double _res = 0;
+  String _operador = "";
+  double _operando1 = 0;
 
-  void _presionaNumero(String number){
-    setState(() {
-      _display += number;
-    });
-  }
+  List<List<dynamic>> _presionBoton = [
+    [7, 8, 9, "/"],
+    [4, 5, 6, "*"],
+    [1, 2, 3, "-"],
+    [".", 0, "=", "+"],
+  ];
 
-  void _presionaOperacion (String operacion){
-    switch (operacion){
-      case "/":
-        _isdouble = false;
-        _operacion = "/";
+  Widget construirTeclado(BuildContext context) {
+    List<Widget> columnas = [];
 
-        if(_ope1 == null){
-          _res = double.tryParse(_display)!;
-          _ope1 = _res;
+    for (int i = 0; i < 4; i++) {
+      List<Widget> botones = [];
 
-          //limpia display
-          setState(() {
-            _display="";
-          });
-        }else{
-          _res = double.tryParse(_display)!;
-          _ope2 = _res;
-          _res = (_ope1! / _ope2!);
-          setState(() {
-            _display=_res.toString();
-          });
-        }
-        break;
-    }
-  }
-
-  void _presionaSimbolo(String simbolo){
-    if(simbolo == "."){
-      if(_isdouble == false){
-        _isdouble = true;
-        _display += ".";
-        setState(() {
-          _display = _display;
-        });
+      for (int j = 0; j < 4; j++) {
+        botones.add(
+          MaterialButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: const BorderSide(color: Colors.grey),
+            ),
+            color: Theme.of(context).colorScheme.inversePrimary,
+            onPressed: () {
+              _cambiaNumero(_presionBoton[j][i]);
+            },
+            child: Text(
+              "${_presionBoton[j][i]}",
+              style: const TextStyle(
+                fontSize: 32,
+              ),
+            ),
+          ),
+        );
       }
+      columnas.add(
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: botones,
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: columnas,
+    );
+  }
+
+  void _cambiaNumero(dynamic n) {
+    if (n is int) {
+      _Sres += n.toString();
       setState(() {
-        _display = _display;
+        _res = double.tryParse(_Sres) ?? 0.0;
       });
     }
-    if(simbolo == "=") {
 
-      // aplicar logica para realizar operacion con solo dos operandos
-      if(_res == null){
+    if (n is String) {
+      if (n == ".") {
+        if (!_punto) {
+          _punto = true;
+          _Sres += ".";
+          setState(() {
+            _res = double.tryParse(_Sres) ?? 0.0;
+          });
+        }
+      }
+
+      if (n == "+" || n == "-" || n == "*" || n == "/") {
         setState(() {
-          _display = _display;
+          _operando1 = _res;
+          _operador = n;
+          _Sres = "";
         });
-      }else{
+      }
+
+      if (n == "=") {
         setState(() {
-          _display = _res.toString();
+          if (_operador == "+") {
+            _res = _operando1 + _res;
+          } else if (_operador == "-") {
+            _res = _operando1 - _res;
+          } else if (_operador == "*") {
+            _res = _operando1 * _res;
+          } else if (_operador == "/") {
+            if (_res == 0) {
+              _Sres = "Error"; // Previene división por cero
+              return;
+            }
+            _res = _operando1 / _res;
+          }
+          _Sres = _res.toString();
+          _operador = ""; // Resetea el operador después del cálculo
         });
       }
     }
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.orange,
-          title: Text("Calculadora"),
+      appBar: AppBar(
+        backgroundColor: Colors.orange,
+        title: const Text("Calculadora"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              color: Colors.orangeAccent,
+              width: 320,
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                _Sres,
+                style: const TextStyle(fontSize: 32),
+                textAlign: TextAlign.end,
+              ),
+            ),
+            const SizedBox(height: 7),
+            construirTeclado(context),
+          ],
         ),
-        body: Center(
-            child: Column(
-                mainAxisAlignment:  MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    color: Colors.orangeAccent,
-                    width: 320,
-                    child: Text(
-                      _display,
-                      style: TextStyle(
-                        fontSize: 32
-                      ),
-                      textAlign:  TextAlign.end,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          MaterialButton(
-                              child: Text(
-                                "7",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("7");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "4",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("4");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "1",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("1");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                ".",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaSimbolo(".");
-                              }
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          MaterialButton(
-                              child: Text(
-                                "8",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("8");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "5",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("5");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "2",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("2");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "0",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("0");
-                              }
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          MaterialButton(
-                              child: Text(
-                                "9",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("9");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "6",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("6");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "3",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaNumero("3");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "=",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaSimbolo("=");
-                              }
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          MaterialButton(
-                              child: Text(
-                                "/",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaOperacion("/");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "*",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaOperacion("*");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "-",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaOperacion("-");
-                              }
-                          ),
-                          MaterialButton(
-                              child: Text(
-                                "+",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                ),
-                              ),
-                              onPressed:(){
-                                _presionaOperacion("+");
-                              }
-                          ),
-                        ],
-                      )
-                    ],
-                  )
-                ]
-            )
-        )
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:prueba/pantallas/calculadora.dart';
+import 'package:prueba/navegador.dart';
+
 
 
 class MyApp extends StatelessWidget {
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const Calculadora(),
+      home: const Navegador(),
+
     );
   }
 }

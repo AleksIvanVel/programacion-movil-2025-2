@@ -33,13 +33,12 @@ class _NavegadorState extends State<Navegador>{
   }
 
   void _cambiaPantalla(int v){
-    if(v == 0) {
-      _p--;
-    }
-    if(v == 1 ){
-      _p++;
-    }
     setState(() {
+      if (v == 0 && _p > 0) {
+        _p--; // Retrocede si no está en la primera pantalla
+      } else if (v == 1 && _p < _pantallas.length - 1) {
+        _p++; // Avanza si no está en la última pantalla
+      }
       _cuerpo = _pantallas[_p];
     });
   }
