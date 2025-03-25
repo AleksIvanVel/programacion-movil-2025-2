@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:prueba/pantallas/principal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Otra extends StatefulWidget{
   const Otra({super.key, required this.titulo });
@@ -11,6 +12,26 @@ class Otra extends StatefulWidget{
 }
 
 class _NavegadorState extends State<Otra>{
+  String _Nombre = "";
+
+
+  void _leerDatos() async{
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String?  aux = prefs.getString("Nombre");
+    if(aux != null){
+      setState(() {
+        _Nombre = aux;
+      });
+    }
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _leerDatos();
+  }
+
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -22,12 +43,19 @@ class _NavegadorState extends State<Otra>{
           child: Column(
             mainAxisAlignment:  MainAxisAlignment.center,
             children: <Widget>[
-              const Text(
-                'Texto de segunda pagina',
+               Text(
+                'Bienvenid@',
                 style: TextStyle(
                   fontSize: 40
                 ),
               ),
+               Text(
+                _Nombre,
+                style: TextStyle(
+                    fontSize: 40
+                ),
+              ),
+
             ]
           )
         )
