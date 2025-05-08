@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:prueba/pantallas/calculadora.dart';
+import 'package:prueba/pantallas/calendario.dart';
 import 'package:prueba/pantallas/ingreso.dart';
+import 'package:prueba/pantallas/localizacion.dart';
+import 'package:prueba/pantallas/personal.dart';
 import 'package:prueba/pantallas/principal.dart';
 import 'package:prueba/pantallas/bienvenida.dart';
 
@@ -37,6 +40,9 @@ class _NavegadorState extends State<Navegador>{
     _pantallas.add(const Otra(titulo: "Bienvenid@"));
     _pantallas.add(const Calculadora());
     _pantallas.add(Ingreso(titulo: "Ingresar", bienvenido: _cambiaPantalla,));
+    _pantallas.add(const Localizacion(titulo: "Localizacion"));
+    _pantallas.add(const Calendario(titulo: "Calendario"));
+    _pantallas.add(const Personalizada(titulo: "Personalizada",));
 
     _cuerpo = _pantallas[_p];
   }
@@ -67,6 +73,18 @@ class _NavegadorState extends State<Navegador>{
             BottomNavigationBarItem(
                 icon: Icon(Icons.logout_outlined),
                 label: 'Ingresar'
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.share_location_outlined),
+                label: 'Localización'
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_month),
+                label: 'Calendario'
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Personalizada'
             ),
           ]
       ),

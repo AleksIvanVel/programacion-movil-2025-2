@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 
 class MyHomePage extends StatefulWidget {
@@ -12,17 +14,60 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   double  _counter = 0;
+  String _imagen = "";
+  final FirebaseFirestore db = FirebaseFirestore.instance;
+
+
+  void _leerBase() async {
+    try {
+      DocumentSnapshot doc = await db.collection("numeros").doc("ElContador").get();
+
+      if (doc.exists) {
+        // cast seguro del valor, asegurando que sea numérico
+        final dynamic valor = doc.get("contador");
+          setState(() {
+            _counter = valor.toDouble();
+          });
+        
+      } else {
+        print("Documento 'ElContador' no encontrado en la colección 'numeros'");
+      }
+    } catch (e) {
+      print("❌ Error al leer la base: $e");
+    }
+  }
+
+  void _escribirBase() async {
+    Map<String, dynamic> datos = {
+      "contador": _counter
+    };
+    try {
+      await db.collection("numeros").doc("ElContador").set(datos);
+      print("Se ha escrito $_counter en la base de datos");
+    } catch (e) {
+      print("Error al escribir la base de datos: $e");
+    }
+  }
+
 
   void _incrementCounter() {
     setState(() {
       _counter+=5;
     });
+    _escribirBase();
   }
 
   void _decrementCounter() {
     setState(() { //actualiza el estado del widget y lo reconstruye
       _counter-=5;
     });
+    _escribirBase();
+  }
+
+  @override
+  initState(){
+    super.initState();
+    _leerBase();
   }
 
   @override
